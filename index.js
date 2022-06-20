@@ -105,7 +105,7 @@ window.addEventListener("load", async () => {
 
   modal.addEventListener("click", (e) => e.stopPropagation());
 
-  const { token, family_id } = getQueryParams();
+  const { token, family_id, user_id } = getQueryParams();
 
   console.log(token, family_id);
   tasks = await fetch(
