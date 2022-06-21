@@ -1,6 +1,7 @@
 const dates = [{ date: 12523089431, todos: [] }];
 let progress = 70;
 let tasks = [];
+let helper_id;
 
 const createElement = (el, className, html) => {
   const newEl = document.createElement(el);
@@ -55,6 +56,7 @@ window.addEventListener("load", async () => {
         body: JSON.stringify({
           ...tasks[index],
           was_completed: true,
+          helper_id,
         }),
         headers: {
           Authorization: token,
@@ -106,8 +108,7 @@ window.addEventListener("load", async () => {
   modal.addEventListener("click", (e) => e.stopPropagation());
 
   const { token, family_id, user_id } = getQueryParams();
-
-  console.log(token, family_id);
+  helper_id = user_id;
   tasks = await fetch(
     `https://tamar.project-babaev.ru/api/tasks/tasks-for-family/${family_id}`,
     {
