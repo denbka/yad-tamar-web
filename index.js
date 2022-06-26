@@ -44,6 +44,14 @@ const setProgressHeader = () => {
     progress.toString() + "%";
 };
 
+const getStatus = (currentTask) => {
+  console.log(currentTask);
+  if (currentTask.helper_id && currentTask.was_completed) {
+    return "Job was completed";
+  }
+  return !currentTask?.helper_id ? "Not taken" : "In work";
+};
+
 window.addEventListener("load", async () => {
   const modal = document.querySelector(".modal__content");
   const modalOverlay = document.querySelector(".modal");
@@ -69,11 +77,17 @@ window.addEventListener("load", async () => {
   };
 
   const toggleModal = (index) => {
+    modal.innerHTML = "";
     if (!index) {
       modalOverlay.classList.toggle("hidden");
       return;
     }
     const task = createElement("div", "modal__task");
+    const status = createElement(
+      "div",
+      "modal__task__status",
+      getStatus(tasks[index])
+    );
     const title = createElement(
       "div",
       "modal__task__title",
@@ -94,6 +108,7 @@ window.addEventListener("load", async () => {
     updateButton.addEventListener("click", () => updateTask(index));
 
     task.append(title);
+    task.append(status);
     task.append(date);
     task.append(divider);
     task.append(description);

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join to the family</title>
+</head>
+
+<body>
+
+    <script>
+        const getQueryParams = () => {
+            const searchQuery = window.location.search;
+            if (!searchQuery.length) {
+                return;
+            }
+            return searchQuery
+                .slice(1, searchQuery.length)
+                .split("&")
+                .reduce((state, current) => {
+                    const [key, value] = current.split("=");
+                    return {
+                        ...state,
+                        [key]: value,
+                    };
+                }, {});
+        };
+
+        const { token } = getQueryParams();
+
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = `yadtamar://register?token=${token}`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    </script>
+</body>
+
+</html>
