@@ -58,26 +58,43 @@ window.addEventListener("load", async () => {
   const list = document.querySelector(".task-list");
 
   const updateTask = async (index) => {
+    const was_completed = !!tasks[index].helper_id;
     try {
-      await fetch(`https://tamar.project-babaev.ru/api/tasks/${family_id}`, {
-        method: "put",
-        body: JSON.stringify({
-          ...tasks[index],
-          was_completed: true,
-          helper_id,
-        }),
-        headers: {
-          Authorization: token,
-        },
-      }).then((res) => res.json());
+      await fetch(
+        `https://tamar.project-babaev.ru/api/tasks/${tasks[index].task_id}`,
+        {
+          method: "put",
+          body: JSON.stringify({
+            ...tasks[index],
+            helper_id,
+            was_completed,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      ).then((res) => res.json());
+      window.location.reload();
     } finally {
       modalOverlay.classList.toggle("hidden");
       modal.innerHTML = "";
+      // if (was_completed) toggleModal(index, true);
     }
   };
 
-  const toggleModal = (index) => {
+  const toggleModal = (index, isSuccess) => {
     modal.innerHTML = "";
+    // if (isSuccess) {
+    //   // <!-- <div class="modal__progress">
+    //   //               <div class="modal__progress__title">Good Job!</div>
+    //   //               <div class="progress__container">
+    //   //                   <div id="middle-circle" class="modal-middle-circle"></div>
+    //   //                   <div id="progress-spinner" class="modal-progress-spinner"></div>
+    //   //               </div>
+    //   //           </div> -->
+    //   return;
+    // }
     if (!index) {
       modalOverlay.classList.toggle("hidden");
       return;
@@ -104,7 +121,11 @@ window.addEventListener("load", async () => {
       "modal__task__description",
       tasks[index].comments
     );
-    const updateButton = createElement("div", "task__title", "Take the task");
+    const updateButton = createElement(
+      "div",
+      "task__title",
+      tasks[index].helper_id ? "Complete the task" : "Take the task"
+    );
     updateButton.addEventListener("click", () => updateTask(index));
 
     task.append(title);
@@ -124,31 +145,36 @@ window.addEventListener("load", async () => {
 
   const { token, family_id, user_id } = getQueryParams();
   helper_id = user_id;
-  tasks = await fetch(
-    `https://tamar.project-babaev.ru/api/tasks/tasks-for-family/${family_id}`,
-    {
-      headers: {
-        Authorization: token,
-      },
-    }
-  ).then((res) => res.json());
+  try {
+    tasks = await fetch(
+      `https://tamar.project-babaev.ru/api/tasks/tasks-for-family/${family_id}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    ).then((res) => res.json());
 
-  tasks.map((item, index) => {
-    const date = luxon.DateTime.fromSeconds(Number(item.date)).toLocaleString(
-      luxon.DateTime.TIME_SIMPLE
-    );
+    tasks.map((item, index) => {
+      const date = luxon.DateTime.fromSeconds(Number(item.date)).toLocaleString(
+        luxon.DateTime.TIME_SIMPLE
+      );
 
-    addTaskToHTML({ ...item, date }, list, index);
-  });
+      addTaskToHTML({ ...item, date }, list, index);
+    });
 
-  document.querySelectorAll(".task").forEach((title) =>
-    title.addEventListener("click", (e) => {
-      toggleModal(e.target.attributes["data-id"].value);
-    })
-  );
+    document.querySelectorAll(".task").forEach((title) => {
+      if (title.classList.contains("task-completed")) return;
+      title.addEventListener("click", (e) => {
+        toggleModal(e.target.attributes["data-id"].value);
+      });
+    });
 
-  setProgressHeader();
-  setProgressTask();
+    setProgressHeader();
+    setProgressTask();
+  } catch (e) {
+    list.innerHTML = "no tasks for this family";
+  }
 });
 
 const addTaskToHTML = (item, list, index) => {
@@ -166,7 +192,9 @@ const addTaskToHTML = (item, list, index) => {
                         </svg>
                     </div>
                 </div>
-                <div class="task" data-id="${index}">
+                <div class="${
+                  item.was_completed ? "task task-completed" : "task"
+                }" data-id="${index}">
                     <div class="task__title" data-id="${index}">
                         ${item.task_name}
                     </div>
