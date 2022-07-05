@@ -85,16 +85,16 @@ window.addEventListener("load", async () => {
 
   const toggleModal = (index, isSuccess) => {
     modal.innerHTML = "";
-    // if (isSuccess) {
-    //   // <!-- <div class="modal__progress">
-    //   //               <div class="modal__progress__title">Good Job!</div>
-    //   //               <div class="progress__container">
-    //   //                   <div id="middle-circle" class="modal-middle-circle"></div>
-    //   //                   <div id="progress-spinner" class="modal-progress-spinner"></div>
-    //   //               </div>
-    //   //           </div> -->
-    //   return;
-    // }
+    if (isSuccess) {
+      // <!-- <div class="modal__progress">
+      //               <div class="modal__progress__title">Good Job!</div>
+      //               <div class="progress__container">
+      //                   <div id="middle-circle" class="modal-middle-circle"></div>
+      //                   <div id="progress-spinner" class="modal-progress-spinner"></div>
+      //               </div>
+      //           </div> -->
+      return;
+    }
     if (!index) {
       modalOverlay.classList.toggle("hidden");
       return;
